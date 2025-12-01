@@ -38,7 +38,7 @@ Clone the repository
 
 Bash
 
-git clone https://github.com/jayleecoder1809/DeepSearch_Pro.git
+git clone https://github.com/jianli1806/DeepSearch_Pro.git
 cd DeepSearch_Pro
 Install dependencies
 
