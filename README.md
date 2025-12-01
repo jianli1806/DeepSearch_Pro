@@ -19,7 +19,7 @@
 
 The system follows a multi-agent architecture:
 
-```mermaid
+
 graph LR
     User[User Input] --> Planner
     Planner[🧠 Planner Node] -->|Generate Queries| Search[🕵️ Research Node]
