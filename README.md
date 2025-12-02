@@ -36,24 +36,20 @@ API Keys for Groq & Tavily
 Installation
 Clone the repository
 
-Bash
-
 git clone https://github.com/jianli1806/DeepSearch_Pro.git
 cd DeepSearch_Pro
 Install dependencies
 
-Bash
+
 
 pip install -r requirements.txt
 Configure Environment Create a .env file in the root directory:
 
-Code snippet
+
 
 GROQ_API_KEY=your_groq_api_key_here
 TAVILY_API_KEY=your_tavily_api_key_here
 Run the Application
-
-Bash
 
 streamlit run main.py
 🛠️ Tech Stack
