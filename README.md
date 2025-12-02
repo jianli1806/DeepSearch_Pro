@@ -19,13 +19,15 @@
 
 The system follows a multi-agent architecture:
 
-
+```mermaid
 graph LR
     User[User Input] --> Planner
     Planner[🧠 Planner Node] -->|Generate Queries| Search[🕵️ Research Node]
     Search -->|Fetch & Summarize| Context[Context Window]
     Context --> Writer[✍️ Writer Node]
     Writer -->|Final Report| Output[Markdown Report]
+```
+
 
 🚀 Quick Start
 Prerequisites
