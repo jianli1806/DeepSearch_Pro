@@ -1,5 +1,4 @@
 import streamlit as st
-import time
 from agent_engine import ResearchAgent
 
 # ==================== Page Configuration ====================
@@ -9,19 +8,33 @@ st.set_page_config(
     layout="wide"
 )
 
-# Custom CSS for better UI (Dark mode compatible)
+# ==================== CSS Fixes (关键修复) ====================
+# 1. fix-scroll: 强制主区域高度，防止错位
+# 2. padding-bottom: 预留底部空间，防止生成时内容被遮挡
 st.markdown("""
 <style>
+    .main {
+        padding-bottom: 100px; 
+    }
     .stButton>button {
         width: 100%;
         background-color: #FF4B4B;
         color: white;
+        border: none;
+        padding: 10px;
+        border-radius: 5px;
+        font-weight: bold;
     }
     .report-box {
-        border: 1px solid #ddd;
+        border: 1px solid #e0e0e0;
         padding: 20px;
         border-radius: 10px;
-        background-color: #f9f9f9;
+        background-color: #ffffff;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    /* 修复 Streamlit Cloud 上的滚动抖动 */
+    [data-testid="stAppViewContainer"] {
+        overflow-y: scroll; 
     }
 </style>
 """, unsafe_allow_html=True)
@@ -35,9 +48,8 @@ with st.sidebar:
     st.markdown("### About Project")
     st.info(
         "This is an **Agentic AI** autonomous research assistant.\n\n"
-        "Unlike standard Chatbots that rely solely on memory, this agent can "
-        "**autonomously browse the web**, **read pages**, **verify facts**, "
-        "and generate professional reports with citations."
+        "Unlike standard Chatbots, this agent **plans**, **searches**, "
+        "**reads**, and **synthesizes** information from the live web."
     )
 
 # ==================== Main Interface ====================
@@ -52,48 +64,54 @@ if st.button("🚀 Start Deep Research", use_container_width=True):
     if not task_input:
         st.warning("Please enter a topic first!")
     else:
+        # 使用空容器占位，保证布局稳定
+        status_placeholder = st.empty()
+        report_placeholder = st.container()
+
         try:
             # Instantiate Agent
             agent = ResearchAgent()
             
-            # Create status container
-            status_container = st.status("🕵️ Agent is working...", expanded=True)
+            # --- 阶段 1: 进度展示 (Status) ---
+            with status_placeholder.status("🕵️ Agent is working...", expanded=True) as status:
+                
+                status.write("🧠 Decomposing task & generating search strategy...")
+                # 移除 time.sleep，减少渲染卡顿
+                
+                # --- Run the Agent (同步执行) ---
+                result = agent.run(task_input)
+                
+                # 更新进度信息
+                plan = result.get("plan", [])
+                status.write(f"✅ Generated keywords: {', '.join(plan)}")
+                
+                content_count = len(result.get("content", []))
+                status.write(f"✅ Extracted {content_count} web documents")
+                
+                status.write("✍️ Synthesizing final report...")
+                status.update(label="✅ Research Complete!", state="complete", expanded=False)
             
-            # --- Step 1: Planning ---
-            status_container.write("🧠 Decomposing task & generating search strategy...")
-            # Simulate progress for better UX
-            time.sleep(1) 
-            
-            # --- Run the Agent ---
-            # Note: agent.run is synchronous
-            result = agent.run(task_input)
-            
-            # --- Display Steps (Post-execution visualization) ---
-            plan = result.get("plan", [])
-            status_container.write(f"✅ Generated search keywords: {', '.join(plan)}")
-            
-            status_container.write("🌐 Searching 6 concurrent web sources...")
-            content_count = len(result.get("content", []))
-            status_container.write(f"✅ Read and extracted {content_count} core documents")
-            
-            status_container.write("✍️ Synthesizing information and writing report...")
-            status_container.update(label="✅ Research Complete!", state="complete", expanded=False)
-            
-            # --- Result Display Area ---
-            st.divider()
-            st.subheader("📝 Research Report")
-            
-            report = result["final_report"]
-            st.markdown(report)
-            
-            # --- Export Button ---
-            st.download_button(
-                label="📥 Download Report (Markdown)",
-                data=report,
-                file_name=f"report_{task_input[:10].replace(' ', '_')}.md",
-                mime="text/markdown"
-            )
+            # --- 阶段 2: 报告展示 (Report) ---
+            # 在独立的 Container 中渲染，防止和 Status 发生 CSS 冲突
+            with report_placeholder:
+                st.divider()
+                st.subheader("📝 Research Report")
+                
+                report = result["final_report"]
+                
+                # 使用自定义 CSS 框包裹报告，看起来更稳定
+                st.markdown(f'<div class="report-box">{report}</div>', unsafe_allow_html=True)
+                
+                st.markdown("<br>", unsafe_allow_html=True) # 增加一点空隙
+                
+                # Export Button
+                st.download_button(
+                    label="📥 Download Report (Markdown)",
+                    data=report,
+                    file_name=f"report_{task_input[:10].replace(' ', '_')}.md",
+                    mime="text/markdown"
+                )
             
         except Exception as e:
             st.error(f"Runtime Error: {e}")
-            st.error("Please check if API Keys are correctly configured in the .env file.")
+            st.info("Please check if API Keys are correctly configured in Streamlit Secrets.")
