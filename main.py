@@ -2,14 +2,14 @@ import streamlit as st
 import time
 from agent_engine import ResearchAgent
 
-# ==================== 页面配置 ====================
+# ==================== Page Configuration ====================
 st.set_page_config(
     page_title="DeepSearch Pro", 
     page_icon="🔍",
     layout="wide"
 )
 
-# 自定义 CSS 让界面更漂亮 (暗黑模式适配)
+# Custom CSS for better UI (Dark mode compatible)
 st.markdown("""
 <style>
     .stButton>button {
@@ -26,76 +26,74 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# ==================== 侧边栏 ====================
+# ==================== Sidebar ====================
 with st.sidebar:
     st.image("https://img.icons8.com/color/96/000000/artificial-intelligence.png", width=80)
     st.title("DeepSearch Pro")
     st.caption("🚀 Powered by Llama 3 & LangGraph")
     st.markdown("---")
-    st.markdown("### 关于项目")
+    st.markdown("### About Project")
     st.info(
-        "这是一个基于 **Agentic AI** 架构的自主调研助手。\n\n"
-        "它不像 ChatGPT 那样只凭记忆回答，而是会**自主联网**、"
-        "**阅读网页**、**去伪存真**，最后生成带引用的专业报告。"
+        "This is an **Agentic AI** autonomous research assistant.\n\n"
+        "Unlike standard Chatbots that rely solely on memory, this agent can "
+        "**autonomously browse the web**, **read pages**, **verify facts**, "
+        "and generate professional reports with citations."
     )
 
-# ==================== 主界面 ====================
-st.header("🔍 深度调研助手 (AI Agent)")
-st.markdown("输入你想研究的话题，AI 将为你自动执行：`规划` -> `联网搜索` -> `阅读整合` -> `生成报告`")
+# ==================== Main Interface ====================
+st.header("🔍 DeepSearch Pro (AI Agent)")
+st.markdown("Enter a topic, and the AI will execute: `Plan` -> `Web Search` -> `Read & Synthesize` -> `Generate Report`")
 
-# 用户输入
-task_input = st.text_input("请输入研究话题：", placeholder="例如：分析 2024 年生成式 AI 在医疗领域的应用趋势")
+# User Input
+task_input = st.text_input("Enter research topic:", placeholder="e.g., Analysis of Generative AI trends in Healthcare 2024")
 
-# 执行按钮
-if st.button("🚀 开始深度调研", use_container_width=True):
+# Execution Button
+if st.button("🚀 Start Deep Research", use_container_width=True):
     if not task_input:
-        st.warning("请输入话题后再开始！")
+        st.warning("Please enter a topic first!")
     else:
         try:
-            # 实例化 Agent
+            # Instantiate Agent
             agent = ResearchAgent()
             
-            # 创建进度容器
-            status_container = st.status("🕵️ Agent 正在工作中...", expanded=True)
+            # Create status container
+            status_container = st.status("🕵️ Agent is working...", expanded=True)
             
-            # --- 步骤 1: 规划 ---
-            status_container.write("🧠 正在拆解任务，生成搜索策略...")
-            # 这里调用 agent 的内部逻辑并没有暴露每一步的回调，为了演示效果，我们模拟一下进度条
-            # (在进阶版中，我们会用 callback 实时更新，但现在先跑通 MVP)
+            # --- Step 1: Planning ---
+            status_container.write("🧠 Decomposing task & generating search strategy...")
+            # Simulate progress for better UX
             time.sleep(1) 
             
-            # --- 真正运行 Agent ---
-            # 注意：因为 agent.run 是同步的，这里会卡住直到完成。
-            # 为了更好的体验，后续我们可以拆解 run 方法，但现在先看结果。
+            # --- Run the Agent ---
+            # Note: agent.run is synchronous
             result = agent.run(task_input)
             
-            # --- 步骤展示 (从结果反推，或者优化 Agent 类暴露中间步骤) ---
-            # 这里我们假设已经拿到结果，为了展示给用户看，我们打印出它的 Plan
+            # --- Display Steps (Post-execution visualization) ---
             plan = result.get("plan", [])
-            status_container.write(f"✅ 已生成搜索关键词: {', '.join(plan)}")
+            status_container.write(f"✅ Generated search keywords: {', '.join(plan)}")
             
-            status_container.write("🌐 正在并发搜索 6 个网页源...")
+            status_container.write("🌐 Searching 6 concurrent web sources...")
             content_count = len(result.get("content", []))
-            status_container.write(f"✅ 已阅读并提取 {content_count} 份核心资料")
+            status_container.write(f"✅ Read and extracted {content_count} core documents")
             
-            status_container.write("✍️ 正在整合信息并撰写报告...")
-            status_container.update(label="✅ 调研完成！", state="complete", expanded=False)
+            status_container.write("✍️ Synthesizing information and writing report...")
+            status_container.update(label="✅ Research Complete!", state="complete", expanded=False)
             
-            # --- 结果展示区 ---
+            # --- Result Display Area ---
             st.divider()
-            st.subheader("📝 调研报告")
+            st.subheader("📝 Research Report")
             
             report = result["final_report"]
             st.markdown(report)
             
-            # --- 导出按钮 ---
+            # --- Export Button ---
             st.download_button(
-                label="📥 下载报告 (Markdown)",
+                label="📥 Download Report (Markdown)",
                 data=report,
-                file_name=f"report_{task_input[:10]}.md",
+                file_name=f"report_{task_input[:10].replace(' ', '_')}.md",
                 mime="text/markdown"
             )
             
         except Exception as e:
-            st.error(f"运行出错: {e}")
-            st.error("请检查 .env 文件中的 API Key 是否正确配置。")
+            st.error(f"Runtime Error: {e}")
+            st.error("Please check if API Keys are correctly configured in the .env file.")
