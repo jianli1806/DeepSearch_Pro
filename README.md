@@ -28,7 +28,6 @@ graph LR
     Writer -->|Final Report| Output[Markdown Report]
 ```
 
-
 ## 🚀 Quick Start
 
 ### Prerequisites
