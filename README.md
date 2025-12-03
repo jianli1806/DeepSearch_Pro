@@ -29,41 +29,44 @@ graph LR
 ```
 
 
-🚀 Quick Start
-Prerequisites
-Python 3.9+
+## 🚀 Quick Start
 
-API Keys for Groq & Tavily
+### Prerequisites
+* Python 3.9+
+* API Keys for Groq & Tavily
 
-Installation
-Clone the repository
+### Installation
 
-git clone https://github.com/jianli1806/DeepSearch_Pro.git
-cd DeepSearch_Pro
-Install dependencies
+1.  **Clone the repository**
+    ```bash
+    git clone [https://github.com/jianli1806/DeepSearch_Pro.git](https://github.com/jianli1806/DeepSearch_Pro.git)
+    cd DeepSearch_Pro
+    ```
 
+2.  **Install dependencies**
+    ```bash
+    pip install -r requirements.txt
+    ```
 
+3.  **Configure Environment**
+    Create a `.env` file in the root directory:
+    ```env
+    GROQ_API_KEY=your_groq_api_key_here
+    TAVILY_API_KEY=your_tavily_api_key_here
+    ```
 
-pip install -r requirements.txt
-Configure Environment Create a .env file in the root directory:
+4.  **Run the Application**
+    ```bash
+    streamlit run main.py
+    ```
 
+## 🛠️ Tech Stack
 
+* **Orchestration:** LangGraph, LangChain
+* **LLM:** Meta Llama 3.3 (via Groq Cloud)
+* **Search Engine:** Tavily AI Search
+* **Frontend:** Streamlit
+* **Environment:** Python-dotenv
 
-GROQ_API_KEY=your_groq_api_key_here
-TAVILY_API_KEY=your_tavily_api_key_here
-Run the Application
-
-streamlit run main.py
-🛠️ Tech Stack
-Orchestration: LangGraph, LangChain
-
-LLM: Meta Llama 3.3 (via Groq Cloud)
-
-Search Engine: Tavily AI Search
-
-Frontend: Streamlit
-
-Environment: Python-dotenv
-
-📄 License
+## 📄 License
 Distributed under the MIT License.
